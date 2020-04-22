@@ -1,0 +1,17 @@
+name: MasseyHacksMinecraftDiscordLink
+version: 1.0.0
+author: David Hui
+main: ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink
+api-version: '1.15'
+commands:
+  linkdiscord:
+    description: Link your Minecraft account to a Discord user.
+    aliases: [ld]
+    usage: "Usage: /linkdiscord [secret]"
+  unlinkdiscord:
+    description: Unlink your Minecraft account to a Discord user.
+    aliases: [ud]
+  linkstatus:
+    description: View Discord link status.
+  exportbalance:
+    description: Export in-game currency to Discord

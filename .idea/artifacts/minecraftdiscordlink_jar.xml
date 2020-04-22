@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="minecraftdiscordlink:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/minecraftdiscordlink_jar</output-path>
+    <root id="archive" name="minecraftdiscordlink.jar">
+      <element id="module-output" name="minecraftdiscordlink" />
+    </root>
+  </artifact>
+</component>
