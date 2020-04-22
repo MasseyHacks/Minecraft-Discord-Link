@@ -10,12 +10,12 @@ commands:
     aliases: [ld]
     usage: "Usage: /linkdiscord [secret]"
   unlinkdiscord:
-    description: Unlink your Minecraft account to a Discord user.
+    description: Unlink your Minecraft account from a Discord user.
     aliases: [ud]
   linkstatus:
     description: View Discord link status.
   exportbalance:
-    description: Export in-game currency to Discord
+    description: Export in-game currency to the Event Economy
 permissions:
   masseyhacks.economy.keepBalance:
     description: Player's balance does not get pushed to Event Economy database on disconect
