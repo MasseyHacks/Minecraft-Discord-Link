@@ -1,8 +1,9 @@
-name: MasseyHacksMinecraftDiscordLink
+name: MinecraftDiscordLink
 version: 1.0.0
 author: David Hui
 main: ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink
 api-version: '1.15'
+depend: [Vault]
 commands:
   linkdiscord:
     description: Link your Minecraft account to a Discord user.
@@ -15,3 +16,6 @@ commands:
     description: View Discord link status.
   exportbalance:
     description: Export in-game currency to Discord
+permissions:
+  masseyhacks.economy.keepBalance:
+    description: Player's balance does not get pushed to Event Economy database on disconect
