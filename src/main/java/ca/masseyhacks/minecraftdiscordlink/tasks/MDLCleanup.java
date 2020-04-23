@@ -7,27 +7,32 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.time.Instant;
 
 public class MDLCleanup extends BukkitRunnable {
+    private final MinecraftDiscordLink plugin;
+
+    public MDLCleanup(MinecraftDiscordLink plugin){
+        this.plugin = plugin;
+    }
 
     @Override
     public void run() {
         //System.out.println("Running cleanup task");
-        for(String key : MinecraftDiscordLink.confirmStatus.keySet()){
-            LinkConfirmData confirmInfo = MinecraftDiscordLink.confirmStatus.getOrDefault(key, null);
+        for(String key : plugin.confirmStatus.keySet()){
+            LinkConfirmData confirmInfo = plugin.confirmStatus.getOrDefault(key, null);
 
             if(confirmInfo.timestamp != -1L){
                 if(Instant.now().getEpochSecond() - confirmInfo.timestamp >= 30L){
-                    MinecraftDiscordLink.confirmStatus.remove(key);
+                    plugin.confirmStatus.remove(key);
                 }
             }
 
         }
 
-        for(String key : MinecraftDiscordLink.confirmUnlinkStatus.keySet()){
-            Long timestamp = MinecraftDiscordLink.confirmUnlinkStatus.getOrDefault(key, -1L);
+        for(String key : plugin.confirmUnlinkStatus.keySet()){
+            Long timestamp = plugin.confirmUnlinkStatus.getOrDefault(key, -1L);
 
             if(timestamp != -1L){
                 if(Instant.now().getEpochSecond() - timestamp >= 30L){
-                    MinecraftDiscordLink.confirmUnlinkStatus.remove(key);
+                    plugin.confirmUnlinkStatus.remove(key);
                 }
             }
 

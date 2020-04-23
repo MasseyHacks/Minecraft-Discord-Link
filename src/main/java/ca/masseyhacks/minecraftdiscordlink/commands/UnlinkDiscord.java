@@ -18,13 +18,17 @@ import java.time.Instant;
 import static org.bukkit.Bukkit.getLogger;
 
 public class UnlinkDiscord implements CommandExecutor {
+    private final MinecraftDiscordLink plugin;
+    public UnlinkDiscord(MinecraftDiscordLink plugin){
+        this.plugin = plugin;
+    }
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length == 0) {
                 try {
-                    String discordTagLinkTo = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString());
+                    String discordTagLinkTo = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString(), plugin.connection);
 
                     if (discordTagLinkTo.length() == 0) {
                         player.sendMessage("Your Minecraft account is not linked to any Discord user.");
@@ -41,7 +45,7 @@ public class UnlinkDiscord implements CommandExecutor {
 
                     player.spigot().sendMessage(front, cmdClick, back);
 
-                    MinecraftDiscordLink.confirmUnlinkStatus.put(player.getUniqueId().toString(),
+                    plugin.confirmUnlinkStatus.put(player.getUniqueId().toString(),
                             Instant.now().getEpochSecond()
                     );
 
@@ -52,16 +56,16 @@ public class UnlinkDiscord implements CommandExecutor {
                 }
             } else if(args.length == 1 && args[0].equals("confirm")){
 
-                if (!MinecraftDiscordLink.confirmUnlinkStatus.containsKey(player.getUniqueId().toString())) {
+                if (!plugin.confirmUnlinkStatus.containsKey(player.getUniqueId().toString())) {
                     player.sendMessage("No confirmation token found! Try executing the unlink command again.");
                     return true;
                 }
 
                 try {
-                    MDLUtilities.deleteLink(player.getUniqueId().toString());
+                    MDLUtilities.deleteLink(player.getUniqueId().toString(), plugin.connection);
 
                     player.sendMessage(ChatColor.GREEN + "Successfully unlinked! " + ChatColor.WHITE +" If this was done in error, simply run /linkdiscord again with the same secret.");
-                    MinecraftDiscordLink.confirmUnlinkStatus.remove(player.getUniqueId().toString());
+                    plugin.confirmUnlinkStatus.remove(player.getUniqueId().toString());
 
                 } catch (SQLException e) {
                     player.sendMessage("There was an error unlinking your account. Please contact a team member for assistance.");

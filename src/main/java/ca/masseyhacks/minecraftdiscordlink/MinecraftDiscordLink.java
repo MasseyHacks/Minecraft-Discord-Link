@@ -19,12 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MinecraftDiscordLink extends JavaPlugin{
 
-    public static Connection connection;
-    public static ConcurrentHashMap<String, LinkConfirmData> confirmStatus;
-    public static ConcurrentHashMap<String, Long> confirmUnlinkStatus;
+    public Connection connection;
+    public ConcurrentHashMap<String, LinkConfirmData> confirmStatus;
+    public ConcurrentHashMap<String, Long> confirmUnlinkStatus;
+    //public ConcurrentHashMap<UUID, >
 
-    public static Economy econ = null;
-    public static Permission perms = null;
+    public Economy econ = null;
+    public Permission perms = null;
 
     private BukkitRunnable bgScheduleTask;
 
@@ -122,16 +123,16 @@ public class MinecraftDiscordLink extends JavaPlugin{
         getLogger().info("Connection to database established.");
 
         getLogger().info("Registering commands.");
-        getCommand("linkdiscord").setExecutor(new LinkDiscord());
-        getCommand("linkstatus").setExecutor(new ViewDiscordLinkStatus());
-        getCommand("unlinkdiscord").setExecutor(new UnlinkDiscord());
-        getCommand("exportbalance").setExecutor(new ExportBalance());
+        getCommand("linkdiscord").setExecutor(new LinkDiscord(this));
+        getCommand("linkstatus").setExecutor(new ViewDiscordLinkStatus(this));
+        getCommand("unlinkdiscord").setExecutor(new UnlinkDiscord(this));
+        getCommand("exportbalance").setExecutor(new ExportBalance(this));
 
         getLogger().info("Registering event handlers.");
-        getServer().getPluginManager().registerEvents(new OnDisconnect(), this);
+        getServer().getPluginManager().registerEvents(new OnDisconnect(this), this);
 
         getLogger().info("Registering background tasks.");
-        bgScheduleTask = new MDLCleanup();
+        bgScheduleTask = new MDLCleanup(this);
         bgScheduleTask.runTaskTimer(this, 0, 100);
     }
 

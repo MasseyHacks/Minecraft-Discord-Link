@@ -1,6 +1,7 @@
 package ca.masseyhacks.minecraftdiscordlink.commands;
 
 import ca.masseyhacks.minecraftdiscordlink.MDLUtilities;
+import ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -16,13 +17,18 @@ import java.sql.SQLException;
 import static org.bukkit.Bukkit.getLogger;
 
 public class ViewDiscordLinkStatus implements CommandExecutor {
+    private final MinecraftDiscordLink plugin;
+
+    public ViewDiscordLinkStatus(MinecraftDiscordLink plugin){
+        this.plugin = plugin;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] strings) {
         if(sender instanceof Player){
             Player player = (Player) sender;
             try{
-                String discordTag = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString());
+                String discordTag = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString(), plugin.connection);
 
                 if(discordTag.length() > 0){
                     TextComponent front = new TextComponent(player.getName() + " is linked to " + discordTag + ". To unlink your Minecraft account, use ");
