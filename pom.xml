@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ca.masseyhacks</groupId>
-    <artifactId>minecraftdiscordlink</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>MinecraftDiscordLink</artifactId>
+    <version>1.0</version>
 
     <properties>
         <maven.compiler.source>1.11</maven.compiler.source>
@@ -55,4 +55,17 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <release>11</release>  <!--or <release>10</release>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
