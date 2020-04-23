@@ -1,20 +1,20 @@
 package ca.masseyhacks.minecraftdiscordlink;
 
-import net.milkbowl.vault.economy.Economy;
+import ca.masseyhacks.minecraftdiscordlink.structures.ParticipantInfo;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.print.DocFlavor;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static org.bukkit.Bukkit.getLogger;
 
 public class MDLUtilities {
     public static void createLink(MinecraftDiscordLink plugin, UUID mcUUID, String secret) throws SQLException {
-
         Statement stmt = plugin.connection.createStatement();
         String sql = "UPDATE MinecraftDiscordLink SET mcUUID='" +
                 mcUUID.toString() +
@@ -28,7 +28,7 @@ public class MDLUtilities {
         System.out.println(mcUUID);
 
         Statement stmt = plugin.connection.createStatement();
-        String sql = "UPDATE MinecraftDiscordLink SET mcUUID='' WHERE mcUUID='" +
+        String sql = "UPDATE MinecraftDiscordLink SET mcUUID=NULL WHERE mcUUID='" +
                 mcUUID.toString() +
                 "'";
         stmt.execute(sql);
@@ -95,5 +95,69 @@ public class MDLUtilities {
         stmt.execute(sql);
 
         plugin.econ.withdrawPlayer(player, balance);
+    }
+
+    public static HashMap<UUID, ParticipantInfo> getAllLinks(MinecraftDiscordLink plugin) throws SQLException{
+        String sql = "SELECT mcUUID,discordTag,discordID FROM MinecraftDiscordLink";
+
+        Statement stmt = plugin.connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        HashMap<UUID, ParticipantInfo> returnInfo = new HashMap<>();
+
+        while(rs.next()){
+            String mcUUID = rs.getString("mcUUID");
+            String discordTag = rs.getString("discordTag");
+            String discordID = rs.getString("discordID");
+
+            // make sure we have info for every field before adding
+            // players without info get default stuff, no need to add them here
+            if(mcUUID != null && discordTag != null && discordID != null){
+                ParticipantInfo temp = new ParticipantInfo();
+                temp.setDiscordTag(discordTag);
+                temp.setDiscordID(discordID);
+
+                returnInfo.put(UUID.fromString(mcUUID), temp);
+            }
+
+        }
+
+        return returnInfo;
+    }
+
+    public static HashMap<String, ParticipantInfo> getAllBalances(MinecraftDiscordLink plugin) throws SQLException{
+        String sql = "SELECT balance, discordID FROM EventEconomy";
+
+        Statement stmt = plugin.connection.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        HashMap<String, ParticipantInfo> returnInfo = new HashMap<>();
+
+        while(rs.next()){
+            String discordID = rs.getString("discordID");
+            double balance = rs.getDouble("balance");
+
+            if(discordID != null){
+                ParticipantInfo temp = new ParticipantInfo();
+                temp.setBalance(balance);
+                returnInfo.put(discordID, temp);
+            }
+
+        }
+
+        return returnInfo;
+    }
+
+    public static void updateCache(MinecraftDiscordLink plugin) throws SQLException{
+        HashMap<UUID, ParticipantInfo> newLinks = getAllLinks(plugin);
+        HashMap<String, ParticipantInfo> newBalances = getAllBalances(plugin);
+        plugin.placeholderInfoCache.clear();
+
+        // merge the who Participant infos to get all the information about the player
+        for(UUID key:newLinks.keySet()){
+            ParticipantInfo temp = new ParticipantInfo(newLinks.get(key),
+                    newBalances.getOrDefault(newLinks.get(key).getDiscordID(), new ParticipantInfo())); // uses getOrDefault as there may have been an error setting up the balance account
+            plugin.placeholderInfoCache.put(key, temp);
+        }
     }
 }

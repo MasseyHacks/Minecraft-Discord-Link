@@ -29,13 +29,13 @@ public class LinkDiscord implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if(sender instanceof Player){
             Player player = (Player) sender;
-            if(args.length != 1){
+            if(args.length != 1){ // we only accept one argument
                 return false;
             }
             else {
                 String secret = args[0];
 
-                if(secret.equals("confirm")){
+                if(secret.equals("confirm")){ // actually do the link
                     LinkConfirmData confirmInfo = plugin.confirmStatus.getOrDefault(player.getUniqueId(), null);
 
                     if(confirmInfo == null){
@@ -47,6 +47,8 @@ public class LinkDiscord implements CommandExecutor {
                         MDLUtilities.createLink(plugin, player.getUniqueId(), confirmInfo.secret);
                         plugin.confirmStatus.remove(player.getUniqueId());
 
+                        // send a fancy message to the player
+
                         TextComponent front = new TextComponent(ChatColor.GREEN + "Successfully linked! " + ChatColor.WHITE + "If this was in error, run ");
 
                         TextComponent cmdClick = new TextComponent(ChatColor.DARK_PURPLE + "/unlinkdiscord" + ChatColor.WHITE);
@@ -57,17 +59,17 @@ public class LinkDiscord implements CommandExecutor {
 
                         player.spigot().sendMessage(front, cmdClick, back);
 
-
                     } catch(SQLException e){
                         player.sendMessage("There was an error linking your account. Please contact a team member for assistance.");
                     }
 
                     return true;
                 }
-                else {
+                else { // start the process, make the player confirm
                     try{
                         String discordTagFromPlayer = MDLUtilities.getTagFromPlayer(plugin, player.getUniqueId());
 
+                        // make sure player isn't already linked to a Discord account
                         if(discordTagFromPlayer.length() > 0){
                             TextComponent front = new TextComponent("You have already linked this account to " + discordTagFromPlayer + ". To unlink your Minecraft account, use ");
 
@@ -98,6 +100,7 @@ public class LinkDiscord implements CommandExecutor {
 
                         player.spigot().sendMessage(front, cmdClick, back);
 
+                        // add to the confirm cache
                         plugin.confirmStatus.put(player.getUniqueId(),
                                 new LinkConfirmData(secret, Instant.now().getEpochSecond())
                         );

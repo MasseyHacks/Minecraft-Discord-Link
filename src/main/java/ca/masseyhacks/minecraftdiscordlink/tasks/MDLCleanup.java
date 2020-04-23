@@ -17,6 +17,7 @@ public class MDLCleanup extends BukkitRunnable {
     @Override
     public void run() {
         //System.out.println("Running cleanup task");
+        // cleans up the confirm tokens that are older than 30 seconds
         for(UUID key : plugin.confirmStatus.keySet()){
             LinkConfirmData confirmInfo = plugin.confirmStatus.getOrDefault(key, null);
 

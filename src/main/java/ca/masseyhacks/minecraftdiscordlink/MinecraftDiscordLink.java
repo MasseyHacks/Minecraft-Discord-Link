@@ -1,12 +1,12 @@
 package ca.masseyhacks.minecraftdiscordlink;
 
-import ca.masseyhacks.minecraftdiscordlink.commands.ExportBalance;
-import ca.masseyhacks.minecraftdiscordlink.commands.LinkDiscord;
-import ca.masseyhacks.minecraftdiscordlink.commands.UnlinkDiscord;
-import ca.masseyhacks.minecraftdiscordlink.commands.ViewDiscordLinkStatus;
+import ca.masseyhacks.minecraftdiscordlink.commands.*;
 import ca.masseyhacks.minecraftdiscordlink.events.OnDisconnect;
+import ca.masseyhacks.minecraftdiscordlink.expansions.MasseyHacksInfoExpansion;
 import ca.masseyhacks.minecraftdiscordlink.structures.LinkConfirmData;
+import ca.masseyhacks.minecraftdiscordlink.structures.ParticipantInfo;
 import ca.masseyhacks.minecraftdiscordlink.tasks.MDLCleanup;
+import ca.masseyhacks.minecraftdiscordlink.tasks.MDLPlaceholderInfoRefresh;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,16 +23,18 @@ public class MinecraftDiscordLink extends JavaPlugin{
     public Connection connection;
     public ConcurrentHashMap<UUID, LinkConfirmData> confirmStatus;
     public ConcurrentHashMap<UUID, Long> confirmUnlinkStatus;
-    public ConcurrentHashMap<UUID, String> discordTagCache;
+    public ConcurrentHashMap<UUID, ParticipantInfo> placeholderInfoCache;
 
     public Economy econ = null;
     public Permission perms = null;
 
-    private BukkitRunnable bgScheduleTask;
+    private BukkitRunnable bgScheduleTaskCleanup;
+    private BukkitRunnable bgUpdatePlaceholderCache;
 
     public MinecraftDiscordLink(){
         confirmStatus = new ConcurrentHashMap<>();
         confirmUnlinkStatus = new ConcurrentHashMap<>();
+        placeholderInfoCache = new ConcurrentHashMap<>();
     }
 
     private void initDb() throws SQLException{
@@ -101,6 +103,7 @@ public class MinecraftDiscordLink extends JavaPlugin{
         config.addDefault("mysqlUser", "minecraft");
         config.addDefault("mysqlPassword", "password");
         config.addDefault("mysqlDb", "minecraftDB");
+        config.addDefault("placeholderCacheRefreshTime", 600);
 
         config.options().copyDefaults(true);
         saveConfig();
@@ -120,6 +123,8 @@ public class MinecraftDiscordLink extends JavaPlugin{
             return;
         }
 
+        setupPermissions();
+
         getLogger().info("Connection to database established.");
 
         getLogger().info("Registering commands.");
@@ -127,13 +132,25 @@ public class MinecraftDiscordLink extends JavaPlugin{
         getCommand("linkstatus").setExecutor(new ViewDiscordLinkStatus(this));
         getCommand("unlinkdiscord").setExecutor(new UnlinkDiscord(this));
         getCommand("exportbalance").setExecutor(new ExportBalance(this));
+        getCommand("updatecache").setExecutor(new UpdateCache(this));
 
         getLogger().info("Registering event handlers.");
         getServer().getPluginManager().registerEvents(new OnDisconnect(this), this);
 
         getLogger().info("Registering background tasks.");
-        bgScheduleTask = new MDLCleanup(this);
-        bgScheduleTask.runTaskTimer(this, 0, 100);
+        bgScheduleTaskCleanup = new MDLCleanup(this);
+        bgScheduleTaskCleanup.runTaskTimer(this, 0, 100);
+
+        bgUpdatePlaceholderCache = new MDLPlaceholderInfoRefresh(this);
+        bgUpdatePlaceholderCache.runTaskTimer(this, 0, config.getInt("placeholderCacheRefreshTime"));
+
+        getLogger().info("Registering placeholders");
+        if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
+            new MasseyHacksInfoExpansion(this).register();
+        }
+        else{
+            getLogger().warning("Failed to register placeholders. PlaceholderAPI not installed.");
+        }
     }
 
 
@@ -141,6 +158,7 @@ public class MinecraftDiscordLink extends JavaPlugin{
     @Override
     public void onDisable(){
         //Fired when the server stops and disables all plugins
-        bgScheduleTask.cancel();
+        bgScheduleTaskCleanup.cancel();
+        bgUpdatePlaceholderCache.cancel();
     }
 }

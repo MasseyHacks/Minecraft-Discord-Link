@@ -26,10 +26,11 @@ public class UnlinkDiscord implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (args.length == 0) {
+            if (args.length == 0) {  // start the process, make the player confirm
                 try {
                     String discordTagLinkTo = MDLUtilities.getTagFromPlayer(plugin, player.getUniqueId());
 
+                    // make sure the Minecraft account is actually linked to something
                     if (discordTagLinkTo.length() == 0) {
                         player.sendMessage("Your Minecraft account is not linked to any Discord user.");
                         return true;
@@ -54,7 +55,7 @@ public class UnlinkDiscord implements CommandExecutor {
                     e.printStackTrace();
                     return true;
                 }
-            } else if(args.length == 1 && args[0].equals("confirm")){
+            } else if(args.length == 1 && args[0].equals("confirm")){ // confirm stage, actual unlink here
 
                 if (!plugin.confirmUnlinkStatus.containsKey(player.getUniqueId())) {
                     player.sendMessage("No confirmation token found! Try executing the unlink command again.");

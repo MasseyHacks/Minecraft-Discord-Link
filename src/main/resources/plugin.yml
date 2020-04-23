@@ -4,6 +4,8 @@ author: David Hui
 main: ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink
 api-version: '1.15'
 depend: [Vault]
+softdepend:
+  - PlaceholderAPI
 commands:
   linkdiscord:
     description: Link your Minecraft account to a Discord user.
@@ -15,7 +17,17 @@ commands:
   linkstatus:
     description: View Discord link status.
   exportbalance:
-    description: Export in-game currency to the Event Economy
+    description: Export in-game currency to the Event Economy.
+  updatecache:
+    description: Updates the PlaceholderAPI information cache.
 permissions:
+  masseyhacks.*:
+    description: Ability to use all commands
+    children:
+      masseyhacks.updatecache: true
   masseyhacks.economy.keepBalance:
     description: Player's balance does not get pushed to Event Economy database on disconect
+    default: false
+  masseyhacks.updatecache:
+    description: Allows user to update the PlaceHolderAPI information cache.
+    default: op
