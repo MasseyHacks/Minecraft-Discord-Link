@@ -144,7 +144,7 @@ public class MinecraftDiscordLink extends JavaPlugin{
         bgUpdatePlaceholderCache = new MDLPlaceholderInfoRefresh(this);
         bgUpdatePlaceholderCache.runTaskTimer(this, 0, config.getInt("placeholderCacheRefreshTime"));
 
-        getLogger().info("Registering placeholders");
+        getLogger().info("Registering placeholders.");
         if(getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
             new MasseyHacksInfoExpansion(this).register();
         }
