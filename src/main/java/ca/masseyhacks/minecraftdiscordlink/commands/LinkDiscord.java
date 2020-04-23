@@ -36,7 +36,7 @@ public class LinkDiscord implements CommandExecutor {
                 String secret = args[0];
 
                 if(secret.equals("confirm")){
-                    LinkConfirmData confirmInfo = plugin.confirmStatus.getOrDefault(player.getUniqueId().toString(), null);
+                    LinkConfirmData confirmInfo = plugin.confirmStatus.getOrDefault(player.getUniqueId(), null);
 
                     if(confirmInfo == null){
                         sender.sendMessage("No confirmation token found! Try executing the link command again.");
@@ -44,8 +44,8 @@ public class LinkDiscord implements CommandExecutor {
                     }
 
                     try {
-                        MDLUtilities.createLink(player.getUniqueId().toString(), confirmInfo.secret, plugin.connection);
-                        plugin.confirmStatus.remove(player.getUniqueId().toString());
+                        MDLUtilities.createLink(plugin, player.getUniqueId(), confirmInfo.secret);
+                        plugin.confirmStatus.remove(player.getUniqueId());
 
                         TextComponent front = new TextComponent(ChatColor.GREEN + "Successfully linked! " + ChatColor.WHITE + "If this was in error, run ");
 
@@ -66,7 +66,7 @@ public class LinkDiscord implements CommandExecutor {
                 }
                 else {
                     try{
-                        String discordTagFromPlayer = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString(), plugin.connection);
+                        String discordTagFromPlayer = MDLUtilities.getTagFromPlayer(plugin, player.getUniqueId());
 
                         if(discordTagFromPlayer.length() > 0){
                             TextComponent front = new TextComponent("You have already linked this account to " + discordTagFromPlayer + ". To unlink your Minecraft account, use ");
@@ -81,7 +81,7 @@ public class LinkDiscord implements CommandExecutor {
                             return true;
                         }
 
-                        String discordTagLinkTo = MDLUtilities.getTagFromSecret(secret, plugin.connection);
+                        String discordTagLinkTo = MDLUtilities.getTagFromSecret(plugin, secret);
 
                         if(discordTagLinkTo.length() == 0){
                             player.sendMessage("No link request found with that secret. Make sure you have initiated a link through Discord and that the secret has not already been linked.");
@@ -98,7 +98,7 @@ public class LinkDiscord implements CommandExecutor {
 
                         player.spigot().sendMessage(front, cmdClick, back);
 
-                        plugin.confirmStatus.put(player.getUniqueId().toString(),
+                        plugin.confirmStatus.put(player.getUniqueId(),
                                 new LinkConfirmData(secret, Instant.now().getEpochSecond())
                         );
 

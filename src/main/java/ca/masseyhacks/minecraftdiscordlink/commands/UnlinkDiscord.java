@@ -28,7 +28,7 @@ public class UnlinkDiscord implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length == 0) {
                 try {
-                    String discordTagLinkTo = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString(), plugin.connection);
+                    String discordTagLinkTo = MDLUtilities.getTagFromPlayer(plugin, player.getUniqueId());
 
                     if (discordTagLinkTo.length() == 0) {
                         player.sendMessage("Your Minecraft account is not linked to any Discord user.");
@@ -45,7 +45,7 @@ public class UnlinkDiscord implements CommandExecutor {
 
                     player.spigot().sendMessage(front, cmdClick, back);
 
-                    plugin.confirmUnlinkStatus.put(player.getUniqueId().toString(),
+                    plugin.confirmUnlinkStatus.put(player.getUniqueId(),
                             Instant.now().getEpochSecond()
                     );
 
@@ -56,16 +56,16 @@ public class UnlinkDiscord implements CommandExecutor {
                 }
             } else if(args.length == 1 && args[0].equals("confirm")){
 
-                if (!plugin.confirmUnlinkStatus.containsKey(player.getUniqueId().toString())) {
+                if (!plugin.confirmUnlinkStatus.containsKey(player.getUniqueId())) {
                     player.sendMessage("No confirmation token found! Try executing the unlink command again.");
                     return true;
                 }
 
                 try {
-                    MDLUtilities.deleteLink(player.getUniqueId().toString(), plugin.connection);
+                    MDLUtilities.deleteLink(plugin, player.getUniqueId());
 
                     player.sendMessage(ChatColor.GREEN + "Successfully unlinked! " + ChatColor.WHITE +" If this was done in error, simply run /linkdiscord again with the same secret.");
-                    plugin.confirmUnlinkStatus.remove(player.getUniqueId().toString());
+                    plugin.confirmUnlinkStatus.remove(player.getUniqueId());
 
                 } catch (SQLException e) {
                     player.sendMessage("There was an error unlinking your account. Please contact a team member for assistance.");

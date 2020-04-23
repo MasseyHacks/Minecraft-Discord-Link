@@ -21,7 +21,7 @@ public class OnDisconnect implements Listener {
         Player player = event.getPlayer();
         if(!plugin.perms.has(player, "masseyhacks.economy.keepBalance")){
             try{
-                MDLUtilities.exportPlayerBalance(player, plugin.connection, plugin.econ);
+                MDLUtilities.exportPlayerBalance(plugin, player);
             }
             catch (SQLException e){
                 getLogger().warning("There was an error exporting a player's economy balance.");

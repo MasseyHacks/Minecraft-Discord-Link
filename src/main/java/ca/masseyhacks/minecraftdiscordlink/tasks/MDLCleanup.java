@@ -5,6 +5,7 @@ import ca.masseyhacks.minecraftdiscordlink.structures.LinkConfirmData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public class MDLCleanup extends BukkitRunnable {
     private final MinecraftDiscordLink plugin;
@@ -16,7 +17,7 @@ public class MDLCleanup extends BukkitRunnable {
     @Override
     public void run() {
         //System.out.println("Running cleanup task");
-        for(String key : plugin.confirmStatus.keySet()){
+        for(UUID key : plugin.confirmStatus.keySet()){
             LinkConfirmData confirmInfo = plugin.confirmStatus.getOrDefault(key, null);
 
             if(confirmInfo.timestamp != -1L){
@@ -27,7 +28,7 @@ public class MDLCleanup extends BukkitRunnable {
 
         }
 
-        for(String key : plugin.confirmUnlinkStatus.keySet()){
+        for(UUID key : plugin.confirmUnlinkStatus.keySet()){
             Long timestamp = plugin.confirmUnlinkStatus.getOrDefault(key, -1L);
 
             if(timestamp != -1L){

@@ -15,14 +15,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.*;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MinecraftDiscordLink extends JavaPlugin{
 
     public Connection connection;
-    public ConcurrentHashMap<String, LinkConfirmData> confirmStatus;
-    public ConcurrentHashMap<String, Long> confirmUnlinkStatus;
-    //public ConcurrentHashMap<UUID, >
+    public ConcurrentHashMap<UUID, LinkConfirmData> confirmStatus;
+    public ConcurrentHashMap<UUID, Long> confirmUnlinkStatus;
+    public ConcurrentHashMap<UUID, String> discordTagCache;
 
     public Economy econ = null;
     public Permission perms = null;
@@ -67,11 +68,10 @@ public class MinecraftDiscordLink extends JavaPlugin{
 
     private String buildDBURL(String host, String database){
 
-        String url = "jdbc:mysql://" +
+        return "jdbc:mysql://" +
                 host +
                 ":3306/" +
                 database;
-        return url;
     }
     private boolean setupPermissions() {
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);

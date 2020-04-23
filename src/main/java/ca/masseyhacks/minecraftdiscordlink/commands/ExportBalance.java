@@ -20,7 +20,7 @@ public class ExportBalance implements CommandExecutor {
             Player player = (Player) sender;
 
             try {
-                MDLUtilities.exportPlayerBalance(player, plugin.connection, plugin.econ);
+                MDLUtilities.exportPlayerBalance(plugin, player);
                 player.sendMessage("Your point balance of " + plugin.econ.getBalance(player) + " has been exported.");
             }
             catch(SQLException e){

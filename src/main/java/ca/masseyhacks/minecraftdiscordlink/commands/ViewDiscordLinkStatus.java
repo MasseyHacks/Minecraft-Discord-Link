@@ -28,7 +28,7 @@ public class ViewDiscordLinkStatus implements CommandExecutor {
         if(sender instanceof Player){
             Player player = (Player) sender;
             try{
-                String discordTag = MDLUtilities.getTagFromPlayer(player.getUniqueId().toString(), plugin.connection);
+                String discordTag = MDLUtilities.getTagFromPlayer(plugin, player.getUniqueId());
 
                 if(discordTag.length() > 0){
                     TextComponent front = new TextComponent(player.getName() + " is linked to " + discordTag + ". To unlink your Minecraft account, use ");
