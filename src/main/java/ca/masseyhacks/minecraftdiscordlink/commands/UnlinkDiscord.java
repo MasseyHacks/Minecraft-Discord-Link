@@ -3,9 +3,6 @@ package ca.masseyhacks.minecraftdiscordlink.commands;
 import ca.masseyhacks.minecraftdiscordlink.MDLUtilities;
 import ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,6 +33,7 @@ public class UnlinkDiscord implements CommandExecutor {
                         return true;
                     }
 
+                    /*
                     TextComponent front = new TextComponent(ChatColor.DARK_RED + "You are about to unlink your Minecraft account from " + discordTagLinkTo + ". " + ChatColor.WHITE + "This will make all in-game currencies unavailable to the Discord user. Type ");
 
                     TextComponent cmdClick = new TextComponent(ChatColor.DARK_PURPLE + "/unlinkdiscord confirm" + ChatColor.WHITE);
@@ -45,6 +43,16 @@ public class UnlinkDiscord implements CommandExecutor {
                     TextComponent back = new TextComponent(" within 30 seconds to confirm this action.");
 
                     player.spigot().sendMessage(front, cmdClick, back);
+                    player.spigot().sendMessage();*/
+
+                    player.spigot().sendMessage(
+                            MDLUtilities.genCompletedTextComponentSet(
+                                    MDLUtilities.genTextComponentColoured(ChatColor.DARK_RED, "You are about to unlink your Minecraft account from " + discordTagLinkTo + "."),
+                                    MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "This will make all in-game currencies unavailable to the Discord user. Type"),
+                                    MDLUtilities.genTextCommandComponents(ChatColor.DARK_PURPLE, "/unlinkdiscord confirm", "/unlinkdiscord confirm"),
+                                    MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "within 30 seconds to confirm this action.")
+                            ).toArray(new TextComponent[0])
+                    );
 
                     plugin.confirmUnlinkStatus.put(player.getUniqueId(),
                             Instant.now().getEpochSecond()

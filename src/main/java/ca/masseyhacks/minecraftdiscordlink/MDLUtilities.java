@@ -1,13 +1,21 @@
 package ca.masseyhacks.minecraftdiscordlink;
 
 import ca.masseyhacks.minecraftdiscordlink.structures.ParticipantInfo;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.block.data.type.Bed;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.xml.soap.Text;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -159,5 +167,41 @@ public class MDLUtilities {
                     newBalances.getOrDefault(newLinks.get(key).getDiscordID(), new ParticipantInfo())); // uses getOrDefault as there may have been an error setting up the balance account
             plugin.placeholderInfoCache.put(key, temp);
         }
+    }
+
+    public static TextComponent[] genTextComponentColoured(ChatColor color, String text){
+        String[] allWords = text.split(" ");
+        TextComponent[] ret = new TextComponent[allWords.length];
+        for(int i=0;i<allWords.length;i++){
+            ret[i] = new TextComponent(allWords[i] + (i < allWords.length - 1? " " : ""));
+            ret[i].setColor(color);
+        }
+        return ret;
+    }
+
+    public static TextComponent[] genTextCommandComponents(ChatColor color, String command, String text){
+        String[] allWords = text.split(" ");
+        TextComponent[] ret = new TextComponent[allWords.length];
+
+        for(int i=0;i<allWords.length;i++){
+            TextComponent temp = new TextComponent(allWords[i] + (i < allWords.length - 1? " " : ""));
+            temp.setColor(color);
+
+            temp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to put the command into your command bar.").create()));
+            temp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+
+            ret[i] = temp;
+        }
+        return ret;
+    }
+
+    public static ArrayList<TextComponent> genCompletedTextComponentSet(TextComponent[]... textComponents){
+        ArrayList<TextComponent> ret = new ArrayList<>();
+        for (TextComponent[] componentSet: textComponents){
+            ret.addAll(Arrays.asList(componentSet));
+            ret.add(new TextComponent(" "));
+        }
+        ret.remove(ret.size() -1);
+        return ret;
     }
 }

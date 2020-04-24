@@ -4,15 +4,11 @@ import ca.masseyhacks.minecraftdiscordlink.MDLUtilities;
 import ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink;
 import ca.masseyhacks.minecraftdiscordlink.structures.LinkConfirmData;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.w3c.dom.Text;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -49,6 +45,7 @@ public class LinkDiscord implements CommandExecutor {
 
                         // send a fancy message to the player
 
+                        /*
                         TextComponent front = new TextComponent(ChatColor.GREEN + "Successfully linked! " + ChatColor.WHITE + "If this was in error, run ");
 
                         TextComponent cmdClick = new TextComponent(ChatColor.DARK_PURPLE + "/unlinkdiscord" + ChatColor.WHITE);
@@ -57,7 +54,16 @@ public class LinkDiscord implements CommandExecutor {
 
                         TextComponent back = new TextComponent(" to unlink your Minecraft account.");
 
-                        player.spigot().sendMessage(front, cmdClick, back);
+                        player.spigot().sendMessage(front, cmdClick, back);*/
+
+                        player.spigot().sendMessage(
+                                MDLUtilities.genCompletedTextComponentSet(
+                                        MDLUtilities.genTextComponentColoured(ChatColor.GREEN, "Successfully linked!"),
+                                        MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "If this was in error, use"),
+                                        MDLUtilities.genTextCommandComponents(ChatColor.DARK_PURPLE, "/unlinkdiscord", "/unlinkdiscord"),
+                                        MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "to unlink your Minecraft account.")
+                                ).toArray(new TextComponent[0])
+                        );
 
                     } catch(SQLException e){
                         player.sendMessage("There was an error linking your account. Please contact a team member for assistance.");
@@ -71,6 +77,7 @@ public class LinkDiscord implements CommandExecutor {
 
                         // make sure player isn't already linked to a Discord account
                         if(discordTagFromPlayer.length() > 0){
+                            /*
                             TextComponent front = new TextComponent("You have already linked this account to " + discordTagFromPlayer + ". To unlink your Minecraft account, use ");
 
                             TextComponent cmdClick = new TextComponent(ChatColor.DARK_PURPLE + "/unlinkdiscord" + ChatColor.WHITE);
@@ -79,7 +86,14 @@ public class LinkDiscord implements CommandExecutor {
 
                             TextComponent back = new TextComponent(".");
 
-                            player.spigot().sendMessage(front, cmdClick, back);
+                            player.spigot().sendMessage(front, cmdClick, back);*/
+                            player.spigot().sendMessage(
+                                    MDLUtilities.genCompletedTextComponentSet(
+                                            MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "You have already linked this account to " + discordTagFromPlayer + ". To unlink your Minecraft account, use"),
+                                            MDLUtilities.genTextCommandComponents(ChatColor.DARK_PURPLE, "/unlinkdiscord", "/unlinkdiscord"),
+                                            MDLUtilities.genTextComponentColoured(ChatColor.WHITE, ".")
+                                    ).toArray(new TextComponent[0])
+                            );
                             return true;
                         }
 
@@ -90,6 +104,7 @@ public class LinkDiscord implements CommandExecutor {
                             return true;
                         }
 
+                        /*
                         TextComponent front = new TextComponent(ChatColor.DARK_RED + "You are about to link your Minecraft account to " + discordTagLinkTo + ". " + ChatColor.WHITE + "This will allow them to withdraw your in-game currency and associate themselves with you! Use ");
 
                         TextComponent cmdClick = new TextComponent(ChatColor.DARK_PURPLE + "/linkdiscord confirm" + ChatColor.WHITE);
@@ -98,7 +113,15 @@ public class LinkDiscord implements CommandExecutor {
 
                         TextComponent back = new TextComponent(" within 30 seconds to confirm this action.");
 
-                        player.spigot().sendMessage(front, cmdClick, back);
+                        player.spigot().sendMessage(front, cmdClick, back);*/
+                        player.spigot().sendMessage(
+                                MDLUtilities.genCompletedTextComponentSet(
+                                        MDLUtilities.genTextComponentColoured(ChatColor.DARK_RED, "You are about to link your Minecraft account to " + discordTagLinkTo + "."),
+                                        MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "This will allow them to withdraw your in-game currency and associate themselves with you! Use"),
+                                        MDLUtilities.genTextCommandComponents(ChatColor.DARK_PURPLE, "/linkdiscord confirm", "/linkdiscord confirm"),
+                                        MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "within 30 seconds to confirm this action.")
+                                ).toArray(new TextComponent[0])
+                        );
 
                         // add to the confirm cache
                         plugin.confirmStatus.put(player.getUniqueId(),

@@ -3,9 +3,6 @@ package ca.masseyhacks.minecraftdiscordlink.commands;
 import ca.masseyhacks.minecraftdiscordlink.MDLUtilities;
 import ca.masseyhacks.minecraftdiscordlink.MinecraftDiscordLink;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,6 +28,7 @@ public class ViewDiscordLinkStatus implements CommandExecutor {
                 String discordTag = MDLUtilities.getTagFromPlayer(plugin, player.getUniqueId());
 
                 if(discordTag.length() > 0){
+                    /*
                     TextComponent front = new TextComponent(player.getName() + " is linked to " + discordTag + ". To unlink your Minecraft account, use ");
 
                     TextComponent cmdClick = new TextComponent(ChatColor.DARK_PURPLE + "/unlinkdiscord" + ChatColor.WHITE);
@@ -38,8 +36,18 @@ public class ViewDiscordLinkStatus implements CommandExecutor {
                     cmdClick.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/unlinkdiscord"));
 
                     TextComponent back = new TextComponent(".");
-
                     player.spigot().sendMessage(front, cmdClick, back);
+                    */
+
+                    player.spigot().sendMessage(
+                            MDLUtilities.genCompletedTextComponentSet(
+                                    MDLUtilities.genTextComponentColoured(ChatColor.WHITE, player.getName() + " is linked to " + discordTag + ". Use"),
+                                    MDLUtilities.genTextCommandComponents(ChatColor.DARK_PURPLE, "/unlinkdiscord", "/unlinkdiscord"),
+                                    MDLUtilities.genTextComponentColoured(ChatColor.WHITE, "to unlink your Minecraft account.")
+                            ).toArray(new TextComponent[0])
+                    );
+
+
 
                 }
                 else{
