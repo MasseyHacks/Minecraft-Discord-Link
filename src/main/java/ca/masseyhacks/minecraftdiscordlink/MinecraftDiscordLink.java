@@ -3,6 +3,7 @@ package ca.masseyhacks.minecraftdiscordlink;
 import ca.masseyhacks.minecraftdiscordlink.commands.*;
 import ca.masseyhacks.minecraftdiscordlink.events.OnDisconnect;
 import ca.masseyhacks.minecraftdiscordlink.expansions.MasseyHacksInfoExpansion;
+import ca.masseyhacks.minecraftdiscordlink.sql.SQLManager;
 import ca.masseyhacks.minecraftdiscordlink.structures.LinkConfirmData;
 import ca.masseyhacks.minecraftdiscordlink.structures.ParticipantInfo;
 import ca.masseyhacks.minecraftdiscordlink.tasks.MDLCleanup;
@@ -20,7 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MinecraftDiscordLink extends JavaPlugin{
 
-    public Connection connection;
+    //public Connection connection;
+    private SQLManager sql;
+
     public ConcurrentHashMap<UUID, LinkConfirmData> confirmStatus;
     public ConcurrentHashMap<UUID, Long> confirmUnlinkStatus;
     public ConcurrentHashMap<UUID, ParticipantInfo> placeholderInfoCache;
@@ -31,42 +34,40 @@ public class MinecraftDiscordLink extends JavaPlugin{
     private BukkitRunnable bgScheduleTaskCleanup;
     private BukkitRunnable bgUpdatePlaceholderCache;
 
+    public double depositMultiplier;
+
     public MinecraftDiscordLink(){
         confirmStatus = new ConcurrentHashMap<>();
         confirmUnlinkStatus = new ConcurrentHashMap<>();
         placeholderInfoCache = new ConcurrentHashMap<>();
+
+        depositMultiplier = 1.0D;
     }
 
-    private void initDb() throws SQLException{
-        String sqlCreate = "CREATE TABLE IF NOT EXISTS " + "MinecraftDiscordLink"
-                + "  (mcUUID           VARCHAR(36),"
-                + "   discordID            VARCHAR(20),"
-                + "   discordTag          VARCHAR(40),"
-                + "   secret           VARCHAR(36), PRIMARY KEY (`secret`))";
-        Statement stmt = connection.createStatement();
-        stmt.execute(sqlCreate);
+    private void initDb(){
+        sql = new SQLManager(this);
     }
 
-    private boolean initMySQL(String url, String username, String password){
-        try { //We use a try catch to avoid errors, hopefully we don't get any.
-            Class.forName("com.mysql.jdbc.Driver"); //this accesses Driver in jdbc.
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            getLogger().severe("jdbc driver unavailable!");
-            return false;
-        }
-        try { //Another try catch to get any SQL errors (for example connections errors)
-            connection = DriverManager.getConnection(url, username, password);
-            //with the method getConnection() from DriverManager, we're trying to set
-            //the connection's url, username, password to the variables we made earlier and
-            //trying to get a connection at the same time. JDBC allows us to do this.
-            initDb();
-        } catch (SQLException e) { //catching errors)
-            e.printStackTrace(); //prints out SQLException errors to the console (if any)
-            return false;
-        }
-        return true;
-    }
+//    private boolean initMySQL(String url, String username, String password){
+//        try { //We use a try catch to avoid errors, hopefully we don't get any.
+//            Class.forName("com.mysql.jdbc.Driver"); //this accesses Driver in jdbc.
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//            getLogger().severe("jdbc driver unavailable!");
+//            return false;
+//        }
+//        try { //Another try catch to get any SQL errors (for example connections errors)
+//            connection = DriverManager.getConnection(url, username, password);
+//            //with the method getConnection() from DriverManager, we're trying to set
+//            //the connection's url, username, password to the variables we made earlier and
+//            //trying to get a connection at the same time. JDBC allows us to do this.
+//            initDb();
+//        } catch (SQLException e) { //catching errors)
+//            e.printStackTrace(); //prints out SQLException errors to the console (if any)
+//            return false;
+//        }
+//        return true;
+//    }
 
     private String buildDBURL(String host, String database){
 
@@ -99,23 +100,20 @@ public class MinecraftDiscordLink extends JavaPlugin{
         FileConfiguration config = this.getConfig();
 
         // Default config values
-        config.addDefault("mysqlHost", "127.0.0.1");
-        config.addDefault("mysqlUser", "minecraft");
-        config.addDefault("mysqlPassword", "password");
-        config.addDefault("mysqlDb", "minecraftDB");
+        config.addDefault("mysql.Host", "127.0.0.1");
+        config.addDefault("mysql.Port", 3306);
+        config.addDefault("mysql.User", "minecraft");
+        config.addDefault("mysql.Password", "password");
+        config.addDefault("mysql.Db", "minecraftDB");
+        config.addDefault("mysqlPool.MinConnections", 3);
+        config.addDefault("mysqlPool.MaxConnections", 5);
+        config.addDefault("mysqlPool.Timeout", 30000);
         config.addDefault("placeholderCacheRefreshTime", 600);
 
         config.options().copyDefaults(true);
         saveConfig();
 
-        if(!initMySQL(
-                buildDBURL(config.getString("mysqlHost"), config.getString("mysqlDb")),
-                config.getString("mysqlUser"),
-                config.getString("mysqlPassword"))
-        ){
-            // halt setup if MySQL cannot connect
-            return;
-        }
+        initDb();
 
         if (!setupEconomy() ) {
             getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
@@ -133,6 +131,7 @@ public class MinecraftDiscordLink extends JavaPlugin{
         getCommand("unlinkdiscord").setExecutor(new UnlinkDiscord(this));
         getCommand("exportbalance").setExecutor(new ExportBalance(this));
         getCommand("updatecache").setExecutor(new UpdateCache(this));
+        getCommand("depositmultiplier").setExecutor(new DepositMultiplier(this));
 
         getLogger().info("Registering event handlers.");
         getServer().getPluginManager().registerEvents(new OnDisconnect(this), this);
@@ -158,7 +157,12 @@ public class MinecraftDiscordLink extends JavaPlugin{
     @Override
     public void onDisable(){
         //Fired when the server stops and disables all plugins
+        sql.onDisable();
         bgScheduleTaskCleanup.cancel();
         bgUpdatePlaceholderCache.cancel();
+    }
+
+    public SQLManager getSQLManager() {
+        return sql;
     }
 }

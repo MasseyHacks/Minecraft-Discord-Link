@@ -20,6 +20,8 @@ commands:
     description: Export in-game currency to the Event Economy.
   updatecache:
     description: Updates the PlaceholderAPI information cache.
+  depositmultiplier:
+    description: Sets and gets the current deposit multiplier
 permissions:
   masseyhacks.*:
     description: Ability to use all commands

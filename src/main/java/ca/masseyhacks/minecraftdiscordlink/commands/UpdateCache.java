@@ -26,6 +26,9 @@ public class UpdateCache implements CommandExecutor {
                 sender.sendMessage("There was an error updating the discord linkage cache.");
             }
         }
+        else{
+            sender.sendMessage("You do not have permission to perform this action!");
+        }
         return true;
     }
 }
