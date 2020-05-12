@@ -57,6 +57,8 @@ public class MasseyHacksInfoExpansion extends PlaceholderExpansion {
                 } else {
                     return Double.toString(playerBalance);
                 }
+            case "depositMultiplier":
+                return Double.toString(plugin.depositMultiplier);
         }
 
         return null;
