@@ -114,7 +114,7 @@ public class SQLManager {
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
-                return rs.getInt(0) == 1;
+                return rs.getInt(1) == 1;
             }
             return false;
 

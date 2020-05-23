@@ -1,6 +1,7 @@
 package ca.masseyhacks.minecraftdiscordlink;
 
 import ca.masseyhacks.minecraftdiscordlink.commands.*;
+import ca.masseyhacks.minecraftdiscordlink.events.OnConnect;
 import ca.masseyhacks.minecraftdiscordlink.events.OnDisconnect;
 import ca.masseyhacks.minecraftdiscordlink.expansions.MasseyHacksInfoExpansion;
 import ca.masseyhacks.minecraftdiscordlink.sql.SQLManager;
@@ -134,6 +135,7 @@ public class MinecraftDiscordLink extends JavaPlugin{
         getCommand("depositmultiplier").setExecutor(new DepositMultiplier(this));
 
         getLogger().info("Registering event handlers.");
+        getServer().getPluginManager().registerEvents(new OnConnect(this), this);
         getServer().getPluginManager().registerEvents(new OnDisconnect(this), this);
 
         getLogger().info("Registering background tasks.");

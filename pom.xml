@@ -6,7 +6,7 @@
 
     <groupId>ca.masseyhacks</groupId>
     <artifactId>MinecraftDiscordLink</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
